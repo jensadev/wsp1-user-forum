@@ -3,6 +3,9 @@
 <main class="container">
     <h1>{{ title }}</h1>
 
+    {% if user %}
+    <p><a href="/forum/new">New Post</a></p>
+    {% endif %}
     {% if posts.length > 0 %}
     {% include "partials/forum-index.njk" %}
     {% else %}
