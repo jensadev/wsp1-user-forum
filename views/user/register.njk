@@ -1,0 +1,17 @@
+{% extends "layout.njk" %}
+{% block content %}
+<main class="container">
+    <h1>{{ title }}</h1>
+    <form action="/register" method="POST">
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+        <input type="password" name="passwordConfirmation" placeholder="Password">
+        <button type="submit">Register</button>
+    </form>
+    {%- if error -%}
+    <p>
+        {{ error }}
+    </p>
+    {%- endif -%}
+</main>
+{% endblock %}
