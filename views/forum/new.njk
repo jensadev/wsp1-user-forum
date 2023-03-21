@@ -7,10 +7,12 @@
         <textarea name="body" placeholder="Body"></textarea>
         <button type="submit">Post</button>
     </form>
-    {%- if error -%}
-    <p>
-        {{ error }}
-    </p>
+    {%- if errors -%}
+    <ul>
+        {%- for error in errors -%}
+        <li>{{ error }}</li>
+        {%- endfor -%}
+    </ul>
     {%- endif -%}
 </main>
 {% endblock %}
