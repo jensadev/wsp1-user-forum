@@ -63,7 +63,7 @@ describe('3. Authentication', () => {
          * Before east tests, we login the user
          * and create a session for the tests
          */
-        beforeEach(async () => {
+        beforeAll(async () => {
             await testSession.post('/login').send({
                 username: user1.name,
                 password: user1.password,
