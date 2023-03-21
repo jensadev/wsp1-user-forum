@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../utils/database');
 const { authBySession } = require('../middleware/auth');
+const validator = require('validator');
 
 const forumTable = process.env.DATABASE_FORUMTABLE;
 
@@ -22,19 +23,27 @@ router.post('/', authBySession, async (req, res) => {
     // validera title och body
     if (!title) response.errors.push('Title is required');
     if (!body) response.errors.push('Body is required');
-    if (title.length < 3)
+    if (title && title.length < 4)
         response.errors.push('Title must be at least 3 characters');
-    if (body.length < 10)
+    if (body && body.length < 10)
         response.errors.push('Body must be at least 10 characters');
 
-    // sanitize title och body, tvätta datan
-
     if (response.errors.length === 0) {
+        // sanitize title och body, tvätta datan
+        const sanitize = (str) => {
+            let temp = str.trim();
+            temp = validator.stripLow(temp);
+            temp = validator.escape(temp);
+            return temp;
+        };
+        if (title) sanitizedTitle = sanitize(title);
+        if (body) sanitizedBody = sanitize(body);
+
         const [result] = await pool
             .promise()
             .query(
                 `INSERT INTO ${forumTable} (uid, title, body) VALUES (?, ?, ?)`,
-                [req.session.uid, title, body]
+                [req.session.uid, sanitizedTitle, sanitizedBody]
             );
 
         if (result.affectedRows === 1) {
@@ -43,7 +52,7 @@ router.post('/', authBySession, async (req, res) => {
 
         response.msg = 'Could not create post';
     }
-    return res.render('forum/new.njk', {
+    return res.status(400).render('forum/new.njk', {
         title: 'New post',
         ...response,
     });
