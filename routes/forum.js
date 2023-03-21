@@ -27,7 +27,7 @@ router.post('/', authBySession, async (req, res) => {
     if (body.length < 10)
         response.errors.push('Body must be at least 10 characters');
 
-    // sanitize title och body
+    // sanitize title och body, tvätta datan
 
     if (response.errors.length === 0) {
         const [result] = await pool
@@ -36,8 +36,6 @@ router.post('/', authBySession, async (req, res) => {
                 `INSERT INTO ${forumTable} (uid, title, body) VALUES (?, ?, ?)`,
                 [req.session.uid, title, body]
             );
-
-        console.log(result);
 
         if (result.affectedRows === 1) {
             return res.redirect(`/forum/${result.insertId}`);

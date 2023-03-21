@@ -54,7 +54,8 @@ router.post('/login', async (req, res) => {
         req.session.uid = result.id;
         req.session.username = username;
         // return res.redirect(`/user/${userSlug(req.session.username)}`);
-        return res.redirect(`/user/${req.session.uid}`);
+        // return res.redirect(`/user/${req.session.uid}`);
+        return res.redirect(`/user/profile`);
     } catch (error) {
         return res.render('user/login.njk', {
             title: 'Login',
