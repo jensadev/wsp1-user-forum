@@ -3,6 +3,8 @@ const router = express.Router();
 const pool = require('../utils/database');
 const { authBySession } = require('../middleware/auth');
 const sanitize = require('../utils/sanitize');
+const bcrypt = require('bcrypt');
+const validator = require('validator');
 
 const usersTable = process.env.DATABASE_USERSTABLE;
 
@@ -43,24 +45,37 @@ router.post('/register', async function (req, res) {
     };
     // validera username och password
     if (!username) response.errors.push('Username is required');
+    if (username && username.length <= 3)
+        response.errors.push('Username must be at least 3 characters');
+    if (username && !validator.isAlphanumeric(username))
+        response.errors.push('Username must contain only letters and numbers');
+
+    const [user] = await pool
+        .promise()
+        .query(`SELECT * FROM ${usersTable} WHERE name = ? LIMIT 1`, [
+            username,
+        ]);
+    if (user.length > 0) response.errors.push('Username already exists');
+
     if (!password) response.errors.push('Password is required');
     if (!password2) response.errors.push('Password confirmation is required');
-    if (password && password.length <= 3)
-        response.errors.push('Password must be at least 3 characters');
+    if (password && password.length <= 8)
+        response.errors.push('Password must be at least 8 characters');
     if (password && password !== password2)
         response.errors.push('Passwords do not match');
+    if (password && !validator.isStrongPassword(password))
+        response.errors.push(
+            'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character'
+        );
 
     if (response.errors.length === 0) {
-        // sanitize username och password, tvätta datan
-
-        if (username) sanitizedUsername = sanitize(username);
-        if (password) sanitizedPassword = sanitize(password);
+        const hash = await bcrypt.hash(password, 10);
 
         const [result] = await pool
             .promise()
             .query(`INSERT INTO ${usersTable} (name, password) VALUES (?, ?)`, [
-                sanitizedUsername,
-                sanitizedPassword,
+                username,
+                hash,
             ]);
 
         if (result.affectedRows === 1) {
