@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 /* GET home page. */
 router.get('/', function (req, res) {
-    return res.json({ msg: 'Hello World' });
+    return res.render('index.njk', {});
 });
 
 module.exports = router;
