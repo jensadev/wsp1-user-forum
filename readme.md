@@ -48,6 +48,8 @@ Jag har redigerat och lagt till följande i index.
     </form>
 ```
 
+Det finns massa stilar för detta på socket.io sidan, men hur kul är det. Bygg din egen grej!
+
 ## Installera socket.io
 
 ```bash	
